@@ -9,6 +9,14 @@
 
 #include <sstream>
 
+//I'm unsure what happens if you call freeaddrinfo(nullptr), hence this
+//function.
+void safe_freeaddrinfo(struct addrinfo *r){
+    if(r){
+        freeaddrinfo(r);
+    }
+}
+
 bool smpl::Local_Port::_initialize(const std::string &new_ip, const int &new_port) noexcept{
 
     ip = new_ip;
@@ -21,7 +29,7 @@ bool smpl::Local_Port::_initialize(const std::string &new_ip, const int &new_por
     const std::string port_string = s.str();
 
     struct addrinfo *r = nullptr;
-    Tripwire t(std::bind(freeaddrinfo, r));
+    Tripwire t(std::bind(safe_freeaddrinfo, r));
 
     const int addrinfo_status = getaddrinfo(ip.c_str(), port_string.c_str(), nullptr, &r);
     if (addrinfo_status != 0) {
@@ -108,7 +116,7 @@ smpl::Channel* smpl::Remote_Port::connect() noexcept{
     hints.ai_socktype = SOCK_STREAM;
 
     struct addrinfo *r = nullptr;
-    Tripwire t(std::bind(freeaddrinfo, r));
+    Tripwire t(std::bind(safe_freeaddrinfo, r));
 
     const auto addrinfo_status = getaddrinfo(ip.c_str(), port_string.c_str(), &hints, &r);
     if (addrinfo_status != 0) {
