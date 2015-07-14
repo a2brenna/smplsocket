@@ -31,18 +31,17 @@ ssize_t smpl::File_Descriptor::_send(const std::string &msg) noexcept{
     return s;
 }
 
-std::string smpl::File_Descriptor::recv() noexcept{
+ssize_t smpl::File_Descriptor::_recv(std::string &msg) noexcept{
+    msg.clear();
     std::unique_lock<std::mutex> lock(_read_lock);
 
     uint32_t net_length;
 
     if ( ::recv(_fd, &net_length, 4, MSG_NOSIGNAL) != 4){
-        return "";
+        return -1;
     }
 
     uint32_t bytes_remaining = ntohl(net_length);
-
-    std::string msg;
 
     while (msg.length() < bytes_remaining) {
         //PERHAPS REIMPLEMENT USING std::array<char>?
@@ -51,18 +50,18 @@ std::string smpl::File_Descriptor::recv() noexcept{
 
         const int ret = ::recv(_fd, buff, to_read, MSG_NOSIGNAL);
         if (ret < 0) {
-            return "";
+            return -1;
         }
         else {
             msg.append(buff, ret);
         }
     }
 
-
-    return msg;
+    return msg.size();
 }
 
-bool smpl::File_Descriptor::wait() noexcept{
+//TODO: check file descriptor status here?
+smpl::CHANNEL_STATUS smpl::File_Descriptor::wait() noexcept{
     std::unique_lock<std::mutex> lock(_read_lock);
     fd_set set;
     FD_SET(_fd, &set);
@@ -70,9 +69,9 @@ bool smpl::File_Descriptor::wait() noexcept{
     const int ret = select(_fd + 1, &set, nullptr, nullptr, nullptr);
 
     if(ret < 0){
-        return false;
+        return smpl::CHANNEL_BLOCKED;
     }
     else{
-        return true;
+        return smpl::CHANNEL_READY;
     }
 }

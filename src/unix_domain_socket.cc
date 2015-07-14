@@ -61,7 +61,7 @@ smpl::Local_UDS::~Local_UDS(){
     remove(path.c_str());
 }
 
-smpl::Channel* smpl::Local_UDS::listen() noexcept{
+smpl::Channel* smpl::Local_UDS::_listen() noexcept{
 
     const int a = accept(sockfd, nullptr, nullptr);
     if( a < 0 ){
@@ -77,8 +77,8 @@ smpl::Channel* smpl::Local_UDS::listen() noexcept{
     return fd;
 }
 
-bool smpl::Local_UDS::check() noexcept{
-    return false;
+smpl::ADDRESS_STATUS smpl::Local_UDS::check() noexcept{
+    return smpl::ADDRESS_ERROR;
 }
 
 bool smpl::Remote_UDS::_initialize(const std::string &new_path) noexcept{
@@ -92,7 +92,7 @@ bool smpl::Remote_UDS::_initialize(const std::string &new_path) noexcept{
     }
 }
 
-smpl::Channel* smpl::Remote_UDS::connect() noexcept{
+smpl::Channel* smpl::Remote_UDS::_connect() noexcept{
     const int sockfd = socket(AF_UNIX, SOCK_STREAM, 0);
     if( sockfd < 0 ){
         return nullptr;

@@ -18,14 +18,14 @@ class File_Descriptor : public smpl::Channel {
         std::mutex _read_lock;
         std::mutex _write_lock;
         virtual ssize_t _send(const std::string &msg) noexcept;
+        virtual ssize_t _recv(std::string &msg) noexcept;
 
     public:
 
         virtual ~File_Descriptor();
         File_Descriptor(const int &fd);
 
-        virtual std::string recv() noexcept;
-        virtual bool wait() noexcept;
+        virtual CHANNEL_STATUS wait() noexcept;
 
 };
 
@@ -36,6 +36,7 @@ class Local_Port: public smpl::Local_Address {
         int port = -1;
         int sockfd = -1;
         bool _initialize(const std::string &new_ip, const int &new_port) noexcept;
+        virtual smpl::Channel* _listen() noexcept;
 
     public:
 
@@ -49,8 +50,7 @@ class Local_Port: public smpl::Local_Address {
         };
 
         virtual ~Local_Port();
-        virtual smpl::Channel* listen() noexcept;
-        virtual bool check() noexcept;
+        virtual ADDRESS_STATUS check() noexcept;
 
 };
 
@@ -60,6 +60,7 @@ class Remote_Port : public smpl::Remote_Address {
         std::string ip;
         int port = -1;
         bool _initialize(const std::string &new_ip, const int &new_port) noexcept;
+        virtual smpl::Channel* _connect() noexcept;
 
     public:
 
@@ -71,7 +72,6 @@ class Remote_Port : public smpl::Remote_Address {
                 throw Bad_Address();
             }
         };
-        virtual smpl::Channel* connect() noexcept;
 
 };
 
@@ -81,6 +81,7 @@ class Local_UDS : public smpl::Local_Address {
         std::string path;
         int sockfd = -1;
         bool _initialize(const std::string &new_path) noexcept;
+        virtual smpl::Channel* _listen() noexcept;
 
     public:
 
@@ -94,8 +95,7 @@ class Local_UDS : public smpl::Local_Address {
         };
 
         virtual ~Local_UDS();
-        virtual smpl::Channel* listen() noexcept;
-        virtual bool check() noexcept;
+        virtual ADDRESS_STATUS check() noexcept;
 
 };
 
@@ -104,6 +104,7 @@ class Remote_UDS : public smpl::Remote_Address {
     private:
         std::string path;
         bool _initialize(const std::string &new_path) noexcept;
+        virtual smpl::Channel* _connect() noexcept;
 
     public:
 
@@ -115,7 +116,6 @@ class Remote_UDS : public smpl::Remote_Address {
                 throw Bad_Address();
             }
         };
-        virtual smpl::Channel* connect() noexcept;
 
 };
 

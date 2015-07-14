@@ -77,7 +77,7 @@ smpl::Local_Port::~Local_Port(){
     close(sockfd);
 }
 
-smpl::Channel* smpl::Local_Port::listen() noexcept{
+smpl::Channel* smpl::Local_Port::_listen() noexcept{
 
     const int a = accept(sockfd, nullptr, nullptr);
     if( a < 0 ){
@@ -93,8 +93,8 @@ smpl::Channel* smpl::Local_Port::listen() noexcept{
     return fd;
 }
 
-bool smpl::Local_Port::check() noexcept{
-    return false;
+smpl::ADDRESS_STATUS smpl::Local_Port::check() noexcept{
+    return smpl::ADDRESS_ERROR;
 }
 
 bool smpl::Remote_Port::_initialize(const std::string &new_ip, const int &new_port) noexcept{
@@ -105,7 +105,7 @@ bool smpl::Remote_Port::_initialize(const std::string &new_ip, const int &new_po
     return true;
 }
 
-smpl::Channel* smpl::Remote_Port::connect() noexcept{
+smpl::Channel* smpl::Remote_Port::_connect() noexcept{
     std::stringstream s;
     s << port;
     const std::string port_string = s.str();
