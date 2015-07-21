@@ -20,7 +20,7 @@ ssize_t smpl::File_Descriptor::_send(const std::string &msg) noexcept{
 
 
     const auto l = ::send(_fd, &net_length, 4, MSG_NOSIGNAL);
-    if ( l < 0 ){
+    if ( l != 4 ){
         return -1;
     }
 
@@ -37,7 +37,8 @@ ssize_t smpl::File_Descriptor::_recv(std::string &msg) noexcept{
 
     uint32_t net_length;
 
-    if ( ::recv(_fd, &net_length, 4, MSG_NOSIGNAL) != 4){
+    const auto r = ::recv(_fd, &net_length, 4, MSG_NOSIGNAL);
+    if(r != 4){
         return -1;
     }
 
@@ -49,7 +50,7 @@ ssize_t smpl::File_Descriptor::_recv(std::string &msg) noexcept{
         size_t to_read = std::min((size_t)READ_WINDOW, bytes_remaining - msg.length());
 
         const int ret = ::recv(_fd, buff, to_read, MSG_NOSIGNAL);
-        if (ret < 0) {
+        if (ret <= 0) {
             return -1;
         }
         else {
