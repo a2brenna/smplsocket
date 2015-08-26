@@ -42,18 +42,20 @@ ssize_t smpl::File_Descriptor::_recv(std::string &msg) noexcept{
         return -1;
     }
 
-    uint32_t bytes_remaining = ntohl(net_length);
+    uint32_t message_size = ntohl(net_length);
 
-    while (msg.length() < bytes_remaining) {
-        //PERHAPS REIMPLEMENT USING std::array<char>?
+    while (msg.length() < message_size) {
         char buff[READ_WINDOW];
-        size_t to_read = std::min((size_t)READ_WINDOW, bytes_remaining - msg.length());
+        size_t to_read = std::min((size_t)READ_WINDOW, message_size - msg.length());
 
-        const int ret = ::recv(_fd, buff, to_read, MSG_NOSIGNAL);
-        if (ret <= 0) {
+        const auto ret = ::recv(_fd, buff, to_read, MSG_NOSIGNAL);
+        if (ret < 0) {
             return -1;
         }
-        else {
+        else if (ret == 0){
+            return msg.size();
+        }
+        else{
             msg.append(buff, ret);
         }
     }
@@ -67,7 +69,7 @@ smpl::CHANNEL_STATUS smpl::File_Descriptor::wait() noexcept{
     fd_set set;
     FD_SET(_fd, &set);
 
-    const int ret = select(_fd + 1, &set, nullptr, nullptr, nullptr);
+    const auto ret = select(_fd + 1, &set, nullptr, nullptr, nullptr);
 
     if(ret < 0){
         return smpl::CHANNEL_BLOCKED;
