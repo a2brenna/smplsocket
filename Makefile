@@ -13,7 +13,12 @@ install: libraries
 	mkdir -p ${DESTDIR}/${PREFIX}/include
 	cp *.a ${DESTDIR}/${PREFIX}/lib
 	cp *.so ${DESTDIR}/${PREFIX}/lib
-	cp src/*.h ${DESTDIR}/${PREFIX}/include
+	cp src/smplsocket.h ${DESTDIR}/${PREFIX}/include
+
+uninstall:
+	rm ${DESTDIR}/${PREFIX}/lib/libsmplsocket.so
+	rm ${DESTDIR}/${PREFIX}/lib/libsmplsocket.a
+	rm ${DESTDIR}/${PREFIX}/include/smplsocket.h
 
 libraries: libsmplsocket.so libsmplsocket.a
 
