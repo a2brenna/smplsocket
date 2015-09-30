@@ -1,4 +1,5 @@
 *.o
 *.so
 *.a
-test/
+test_client
+test_server

@@ -8,6 +8,8 @@ CXXFLAGS=-L${LIBRARY_DIR} -I${INCLUDE_DIR} -g -std=c++11 -fPIC -Wall -Wextra -O2
 
 all: libraries
 
+test: test_server test_client
+
 install: libraries
 	mkdir -p ${DESTDIR}/${PREFIX}/lib
 	mkdir -p ${DESTDIR}/${PREFIX}/include
@@ -37,8 +39,15 @@ unix_domain_socket.o: src/unix_domain_socket.cc
 network_socket.o: src/network_socket.cc
 	${CXX} ${CXXFLAGS} -c src/network_socket.cc -o network_socket.o
 
+test_server: src/test_server.cc
+	${CXX} ${CXXFLAGS} src/test_server.cc -o test_server -lsmplsocket
+
+test_client: src/test_client.cc
+	${CXX} ${CXXFLAGS} src/test_client.cc -o test_client -lsmplsocket
+
 clean:
-	rm -rf test/
+	rm -rf test_server
+	rm -rf test_client
 	rm -rf *.o
 	rm -rf *.a
 	rm -rf *.so
