@@ -2,8 +2,7 @@
 
 #include <arpa/inet.h> //for htonl
 #include <unistd.h>
-
-#define READ_WINDOW 4096
+#include <memory>
 
 smpl::File_Descriptor::~File_Descriptor(){
     close(_fd);
@@ -43,24 +42,27 @@ ssize_t smpl::File_Descriptor::_recv(std::string &msg) noexcept{
     }
 
     uint32_t message_size = ntohl(net_length);
+    msg.resize(message_size);
+    char *buff = &msg[0];
+    size_t read = 0;
 
-    while (msg.length() < message_size) {
-        char buff[READ_WINDOW];
-        size_t to_read = std::min((size_t)READ_WINDOW, message_size - msg.length());
+    while (read < message_size) {
+        const size_t to_read = message_size - read;
 
-        const auto ret = ::recv(_fd, buff, to_read, MSG_NOSIGNAL);
-        if (ret < 0) {
-            return -1;
+        const auto ret = ::recv(_fd, (buff + read), to_read, MSG_NOSIGNAL);
+
+        if (ret == 0){
+            return read;
         }
-        else if (ret == 0){
-            return msg.size();
+        else if(ret < 0){
+            return ret;
         }
         else{
-            msg.append(buff, ret);
+            read = read + ret;
         }
     }
 
-    return msg.size();
+    return read;
 }
 
 //TODO: check file descriptor status here?
