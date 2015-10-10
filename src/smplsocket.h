@@ -18,7 +18,9 @@ class File_Descriptor : public smpl::Channel {
         std::mutex _read_lock;
         std::mutex _write_lock;
         virtual ssize_t _send(const std::string &msg) noexcept;
+        virtual ssize_t _send(const char *msg, const size_t &msg_size) noexcept;
         virtual ssize_t _recv(std::string &msg) noexcept;
+        virtual ssize_t _recv(char *buffer, const size_t &buffer_len) noexcept;
 
     public:
 
