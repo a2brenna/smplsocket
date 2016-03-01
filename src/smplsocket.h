@@ -12,8 +12,7 @@
 namespace smpl{
 
 class File_Descriptor : public smpl::Channel {
-
-    private:
+private:
         int _fd;
         std::mutex _read_lock;
         std::mutex _write_lock;
@@ -118,6 +117,60 @@ class Remote_UDS : public smpl::Remote_Address {
                 throw Bad_Address();
             }
         };
+
+};
+
+class Remote_UDP : public smpl::Remote_Postbox {
+
+    private:
+        std::string _ip;
+        int _port;
+        int _sockfd;
+        std::mutex _lock;
+
+        bool _initialize(const std::string &new_ip, const int &new_port);
+
+    public:
+
+        Remote_UDP(const std::string &new_ip, const int &new_port){
+            if(_initialize(new_ip, new_port)){
+                return;
+            }
+            else{
+                //throw Bad_Address();
+            }
+        };
+
+        virtual ~Remote_UDP() noexcept;
+
+        virtual std::string recv() noexcept;
+
+};
+
+class Local_UDP : public smpl::Local_Postbox{
+
+    private:
+        std::string _ip;
+        int _port;
+        int _sockfd;
+        std::mutex _lock;
+
+        bool _initialize(const std::string &new_ip, const int &new_port);
+
+    public:
+
+        Local_UDP(const std::string &new_ip, const int &new_port){
+            if(_initialize(new_ip, new_port)){
+                return;
+            }
+            else{
+                //throw Bad_Address();
+            }
+        };
+
+        virtual ~Local_UDP() noexcept;
+
+        virtual void send(const std::string &m) noexcept;
 
 };
 
