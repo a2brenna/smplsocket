@@ -264,7 +264,7 @@ bool smpl::Remote_UDP::_initialize(const std::string &new_ip, const int &new_por
 
 }
 
-std::string smpl::Remote_UDP::recv() noexcept{
+std::string smpl::Local_UDP::recv() noexcept{
     std::unique_lock<std::mutex> lock(_lock);
     std::string msg;
     msg.clear();
@@ -294,7 +294,7 @@ std::string smpl::Remote_UDP::recv() noexcept{
     return msg;
 }
 
-void smpl::Local_UDP::send(const std::string &msg) noexcept{
+void smpl::Remote_UDP::send(const std::string &msg) noexcept{
     //TODO: de-dup this and File_Descriptor code
     std::unique_lock<std::mutex> lock(_lock);
     ssize_t msg_length = msg.length();

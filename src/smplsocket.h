@@ -143,7 +143,7 @@ class Remote_UDP : public smpl::Remote_Postbox {
 
         virtual ~Remote_UDP() noexcept;
 
-        virtual std::string recv() noexcept;
+        virtual void send(const std::string &m) noexcept;
 
 };
 
@@ -170,7 +170,7 @@ class Local_UDP : public smpl::Local_Postbox{
 
         virtual ~Local_UDP() noexcept;
 
-        virtual void send(const std::string &m) noexcept;
+        virtual std::string recv() noexcept;
 
 };
 
