@@ -306,3 +306,11 @@ void smpl::Remote_UDP::send(const std::string &msg) noexcept{
     (void)s;
     return;
 }
+
+smpl::Local_UDP::~Local_UDP() noexcept{
+    ::close(_sockfd);
+}
+
+smpl::Remote_UDP::~Remote_UDP() noexcept{
+    ::close(_sockfd);
+}
