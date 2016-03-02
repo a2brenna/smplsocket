@@ -16,6 +16,9 @@ install: libraries
 	cp *.a ${DESTDIR}/${PREFIX}/lib
 	cp *.so ${DESTDIR}/${PREFIX}/lib
 	cp src/smplsocket.h ${DESTDIR}/${PREFIX}/include
+	chmod 644 ${DESTDIR}/${PREFIX}/lib/libsmplsocket.a
+	chmod 644 ${DESTDIR}/${PREFIX}/lib/libsmplsocket.so
+	chmod 644 ${DESTDIR}/${PREFIX}/include/smplsocket.h
 
 uninstall:
 	rm ${DESTDIR}/${PREFIX}/lib/libsmplsocket.so
