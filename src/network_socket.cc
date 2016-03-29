@@ -272,7 +272,7 @@ std::string smpl::Local_UDP::recv() noexcept{
 
     uint32_t net_length;
     const auto r = ::recv(_sockfd, &net_length, 4, MSG_NOSIGNAL);
-    (void)r;
+    assert(r == 4);
     uint32_t message_size = ntohl(net_length);
 
     assert(message_size <= _max_msg_size);
@@ -287,15 +287,18 @@ std::string smpl::Local_UDP::recv() noexcept{
 }
 
 void smpl::Remote_UDP::send(const std::string &msg) noexcept{
-    //TODO: de-dup this and File_Descriptor code
     std::unique_lock<std::mutex> lock(_lock);
-    ssize_t msg_length = msg.length();
-    uint32_t net_length = htonl(msg_length);
+    const ssize_t msg_length = msg.length();
+    const uint32_t net_length = htonl(msg_length);
 
-    const auto l = ::send(_sockfd, &net_length, 4, MSG_NOSIGNAL);
-    (void)l;
-    const auto s = ::send(_sockfd, msg.c_str(), msg_length, MSG_NOSIGNAL);
-    (void)s;
+    //Necessary to construct a single contiguous array of bytes so we can use a single send
+    //This way the message is correctly length prefixed AND sent in a single UDP packet
+    //Avoids problems caused by multiple simultaneous senders
+    std::string buffer( (const char *)(&net_length), sizeof(uint32_t) );
+    buffer.append(msg);
+
+    const auto s = ::send(_sockfd, buffer.c_str(), buffer.size(), MSG_NOSIGNAL);
+    assert(s == buffer.size());
     return;
 }
 
