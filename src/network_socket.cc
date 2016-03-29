@@ -5,6 +5,7 @@
 #include <sys/socket.h> //for socket
 #include <unistd.h> //for close
 #include <memory> //for unique_ptr
+#include <cassert>
 #include "tripwire.h" //for safe use of freeaddrinfo()
 
 #include <sstream>
@@ -274,22 +275,13 @@ std::string smpl::Local_UDP::recv() noexcept{
     (void)r;
     uint32_t message_size = ntohl(net_length);
 
+    assert(message_size <= _max_msg_size);
+
     msg.resize(message_size);
     char *buff = &msg[0];
-    size_t read = 0;
 
-    while (read < message_size) {
-        const size_t to_read = message_size - read;
-
-        const auto ret = ::recv(_sockfd, (buff + read), to_read, MSG_NOSIGNAL);
-
-        if (ret <= 0){
-            break;
-        }
-        else{
-            read = read + ret;
-        }
-    }
+    const auto ret = ::recv(_sockfd, buff, message_size, MSG_NOSIGNAL);
+    assert(ret == message_size);
 
     return msg;
 }
