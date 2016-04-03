@@ -9,6 +9,8 @@
 //sort of global locked registry? Prayer?
 //
 
+const size_t CONFIG_MAX_UDP = 512;
+
 namespace smpl{
 
 class File_Descriptor : public smpl::Channel {
@@ -154,7 +156,6 @@ class Local_UDP : public smpl::Local_Postbox{
         int _port;
         int _sockfd;
         std::mutex _lock;
-        size_t _max_msg_size = 512;
 
         bool _initialize(const std::string &new_ip, const int &new_port);
 
@@ -171,7 +172,6 @@ class Local_UDP : public smpl::Local_Postbox{
         Local_UDP(const std::string &new_ip, const int &new_port, const size_t &max_msg_size) :
             Local_UDP(new_ip, new_port)
         {
-            _max_msg_size = max_msg_size;
         };
 
         virtual ~Local_UDP() noexcept;
