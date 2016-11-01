@@ -100,7 +100,7 @@ ssize_t smpl::File_Descriptor::_recv(char *buffer, const size_t &len) noexcept{
     while (read < message_size) {
         const size_t to_read = message_size - read;
 
-        assert( (read + to_read) < len);
+        assert( (read + to_read) <= len);
         const auto ret = ::recv(_fd, (buffer + read), to_read, MSG_NOSIGNAL);
 
         if (ret == 0){
