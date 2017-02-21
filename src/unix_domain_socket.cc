@@ -7,53 +7,61 @@
 
 #define UNIX_MAX_PATH 108
 
+int open_unix_domain_socket(const std::string &new_path){
+    struct addrinfo res;
+    struct sockaddr_un address;
+
+    const auto m = memset(&address, 0, sizeof(struct sockaddr_un));
+    if( m != &address){
+        return -1;
+    }
+
+    address.sun_family = AF_UNIX;
+    strncpy(address.sun_path, new_path.c_str(), UNIX_MAX_PATH);
+    address.sun_path[UNIX_MAX_PATH - 1] = '\0';
+
+    res.ai_addr = (struct sockaddr *)&address;
+    res.ai_addrlen = sizeof(struct sockaddr_un);
+
+    const int sockfd =  socket(AF_UNIX, SOCK_STREAM, 0);
+    if( sockfd < 0 ){
+        return -1;
+    }
+
+    const int yes = 1;
+    const auto a = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
+    const auto b = setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(int));
+    if ((a != 0) || (b != 0)) {
+        return -1;
+    }
+
+    const int bind_result = bind(sockfd, res.ai_addr, res.ai_addrlen);
+    if( bind_result < 0 ){
+        return -1;
+    }
+
+    const int l = ::listen(sockfd, SOMAXCONN);
+    if( l < 0 ){
+        return -1;
+    }
+
+    return sockfd;
+}
+
 bool smpl::Local_UDS::_initialize(const std::string &new_path) noexcept{
     path = new_path;
     if ( path.size() > UNIX_MAX_PATH ){
         return false;
     }
 
-    {
-        struct addrinfo res;
-        struct sockaddr_un address;
+    sockfd = open_unix_domain_socket(new_path);
 
-        const auto m = memset(&address, 0, sizeof(struct sockaddr_un));
-        if( m != &address){
-            return false;
-        }
-
-        address.sun_family = AF_UNIX;
-        strncpy(address.sun_path, path.c_str(), UNIX_MAX_PATH);
-        address.sun_path[UNIX_MAX_PATH - 1] = '\0';
-
-        res.ai_addr = (struct sockaddr *)&address;
-        res.ai_addrlen = sizeof(struct sockaddr_un);
-
-        sockfd =  socket(AF_UNIX, SOCK_STREAM, 0);
-        if( sockfd < 0 ){
-            return false;
-        }
-
-        const int yes = 1;
-        const auto a = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
-        const auto b = setsockopt(sockfd, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(int));
-        if ((a != 0) || (b != 0)) {
-            return false;
-        }
-
-        const int bind_result = bind(sockfd, res.ai_addr, res.ai_addrlen);
-        if( bind_result < 0 ){
-            return false;
-        }
-
-        const int l = ::listen(sockfd, SOMAXCONN);
-        if( l < 0 ){
-            return false;
-        }
-
+    if(sockfd = -1){
+        return false;
     }
-
-    return true;
+    else{
+        return true;
+    }
 }
 
 smpl::Local_UDS::~Local_UDS(){

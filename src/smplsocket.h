@@ -180,6 +180,8 @@ class Local_UDP : public smpl::Local_Postbox{
 
 };
 
+int open_unix_domain_socket(const std::string &new_path);
+
 }
 
 #endif
