@@ -7,7 +7,7 @@
 
 #define UNIX_MAX_PATH 108
 
-int open_unix_domain_socket(const std::string &new_path){
+int smpl::open_unix_domain_socket(const std::string &new_path){
     struct addrinfo res;
     struct sockaddr_un address;
 
