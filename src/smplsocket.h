@@ -169,10 +169,6 @@ class Local_UDP : public smpl::Local_Postbox{
                 //throw Bad_Address();
             }
         };
-        Local_UDP(const std::string &new_ip, const int &new_port, const size_t &max_msg_size) :
-            Local_UDP(new_ip, new_port)
-        {
-        };
 
         virtual ~Local_UDP() noexcept;
 

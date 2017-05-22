@@ -56,7 +56,7 @@ bool smpl::Local_UDS::_initialize(const std::string &new_path) noexcept{
 
     sockfd = open_unix_domain_socket(new_path);
 
-    if(sockfd = -1){
+    if(sockfd == -1){
         return false;
     }
     else{
